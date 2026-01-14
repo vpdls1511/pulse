@@ -6,40 +6,39 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PulseServer {
 
   private final int port;
 
+  private final ExecutorService executor;
+
   public PulseServer(int port) {
+    int threadPoolSize = Runtime.getRuntime().availableProcessors();
+    executor = Executors.newFixedThreadPool(Math.max(threadPoolSize, 2));
     this.port = port;
   }
 
   public void run() throws IOException {
-    ServerSocket serverSocket = new ServerSocket(port);
-    System.out.println("Pulse server started on port " + port);
 
-    while (true) {
-      Socket socket = serverSocket.accept();
+    Thread thread = new Thread(() -> {
+      try (ServerSocket serverSocket = new ServerSocket(port)) {
+        System.out.println("🚀 Pulse Server started on port " + port);
 
-      handleRequest(socket);
-    }
+        while (true) {
+          Socket socket = serverSocket.accept();
+          new Thread(new RequestProcessor(socket)).start();
+        }
+
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
+
+    thread.start();
+    System.out.println("✅ Server thread started.");
   }
 
-  private void handleRequest(Socket socket) throws IOException {
-    BufferedReader reader = new BufferedReader(
-      new InputStreamReader(socket.getInputStream())
-    );
-
-    String line;
-    while ((line = reader.readLine()) != null && !line.isEmpty()) {
-      System.out.println(line);
-    }
-
-    OutputStream outputStream = socket.getOutputStream();
-    outputStream.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
-
-    outputStream.flush();
-    socket.close();
-  }
 }
