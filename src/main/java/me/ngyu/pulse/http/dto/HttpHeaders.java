@@ -17,12 +17,12 @@ public class HttpHeaders {
     return headers.getOrDefault(key, Collections.emptyList());
   }
 
+  public Map<String, List<String>> getAll() {
+    return Collections.unmodifiableMap(headers);
+  }
+
   public String getFirst(String key) {
     List<String> values = get(key);
     return values.isEmpty() ? null : values.get(0);
-  }
-
-  public void printAll() {
-    headers.forEach((k, v) -> System.out.println(k + ": " + v));
   }
 }

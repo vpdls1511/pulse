@@ -1,10 +1,12 @@
 package me.ngyu.pulse.server;
 
 import me.ngyu.pulse.http.dto.HttpRequest;
+import me.ngyu.pulse.http.dto.HttpResponse;
 import me.ngyu.pulse.http.parser.HttpParser;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class RequestProcessor implements Runnable {
 
@@ -23,8 +25,10 @@ public class RequestProcessor implements Runnable {
 
       HttpRequest request = HttpParser.parse(reader);
 
+      String response = HttpResponse.ok(request, "<a> TEST </a>").build();
+
       OutputStream outputStream = this.connection.getOutputStream();
-      outputStream.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+      outputStream.write(response.getBytes(StandardCharsets.UTF_8));
 
       outputStream.flush();
       this.connection.close();
