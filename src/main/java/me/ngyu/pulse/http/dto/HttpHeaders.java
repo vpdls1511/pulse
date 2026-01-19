@@ -1,4 +1,4 @@
-package me.ngyu.pulse.http;
+package me.ngyu.pulse.http.dto;
 
 import java.util.*;
 
@@ -20,5 +20,9 @@ public class HttpHeaders {
   public String getFirst(String key) {
     List<String> values = get(key);
     return values.isEmpty() ? null : values.get(0);
+  }
+
+  public void printAll() {
+    headers.forEach((k, v) -> System.out.println(k + ": " + v));
   }
 }

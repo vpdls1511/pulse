@@ -22,7 +22,7 @@ public class PulseServer {
 
     Thread thread = new Thread(() -> {
       try (ServerSocket serverSocket = new ServerSocket(port)) {
-        System.out.println("🚀 Pulse Server started on port " + port);
+        System.out.println("Pulse Server started on port " + port);
 
         while (true) {
           Socket socket = serverSocket.accept();
@@ -35,7 +35,7 @@ public class PulseServer {
     });
 
     thread.start();
-    System.out.println("✅ Server thread started.");
+    System.out.println("Server thread started.");
   }
 
 }

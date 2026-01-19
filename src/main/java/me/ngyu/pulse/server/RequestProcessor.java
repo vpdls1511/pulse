@@ -1,5 +1,8 @@
 package me.ngyu.pulse.server;
 
+import me.ngyu.pulse.http.dto.HttpRequest;
+import me.ngyu.pulse.http.parser.HttpParser;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -18,10 +21,7 @@ public class RequestProcessor implements Runnable {
         new InputStreamReader(this.connection.getInputStream())
       );
 
-      String line;
-      while ((line = reader.readLine()) != null && !line.isEmpty()) {
-        System.out.println(line);
-      }
+      HttpRequest request = HttpParser.parse(reader);
 
       OutputStream outputStream = this.connection.getOutputStream();
       outputStream.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());

@@ -1,10 +1,12 @@
-package me.ngyu.pulse.http;
+package me.ngyu.pulse.http.parser;
+
+import me.ngyu.pulse.http.dto.HttpHeaders;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 
 public class HeaderParser {
-  public static HttpHeaders parse(BufferedReader reader) throws IOException {
+  public static HttpHeaders parser(BufferedReader reader) throws IOException {
     HttpHeaders headers = new HttpHeaders();
 
     String headerLine;
@@ -22,4 +24,7 @@ public class HeaderParser {
 
     return headers;
   }
+
 }
+
+
