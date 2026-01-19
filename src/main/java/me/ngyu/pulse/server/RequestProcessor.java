@@ -25,7 +25,7 @@ public class RequestProcessor implements Runnable {
 
       HttpRequest request = HttpParser.parse(reader);
 
-      String response = HttpResponse.ok(request, "<a> TEST </a>").build();
+      String response = this.route(request).build();
 
       OutputStream outputStream = this.connection.getOutputStream();
       outputStream.write(response.getBytes(StandardCharsets.UTF_8));
@@ -36,5 +36,14 @@ public class RequestProcessor implements Runnable {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private HttpResponse route(HttpRequest request) {
+    System.out.printf("[%s] %s%n", request.method().toUpperCase(), request.path());
+    return switch (request.path()) {
+      case "/ping" -> HttpResponse.ok(request, "<a> TEST - ping </a>");
+      case "/pong" -> HttpResponse.ok(request, "<a> TEST - pong </a>");
+      default -> HttpResponse.notFound(request);
+    };
   }
 }
