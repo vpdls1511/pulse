@@ -2,6 +2,7 @@ package me.ngyu.pulse;
 
 import me.ngyu.pulse.core.container.BeanContainer;
 import me.ngyu.pulse.core.scanner.ComponentScanner;
+import me.ngyu.pulse.core.scanner.DependencyInjector;
 import me.ngyu.pulse.server.PulseServer;
 
 public class Main {
@@ -10,15 +11,18 @@ public class Main {
 
   public static void main(String[] args) throws Exception {
     BeanContainer beancontainer = new BeanContainer();
-    ComponentScanner scanner = new ComponentScanner(beancontainer);
 
+    ComponentScanner scanner = new ComponentScanner(beancontainer);
     scanner.scan(BASE_PACKAGE);
+
+    DependencyInjector injector = new DependencyInjector(beancontainer);
+    injector.inject();
 
     System.out.println("\uD83D\uDCE6 Registered Beans: ");
     beancontainer.getAllBeans().forEach((clazz, instance) -> {
       System.out.println("- " + clazz.getSimpleName());
     });
 
-    new PulseServer(8080).run();
+    new PulseServer(8080, beancontainer).run();
   }
 }
