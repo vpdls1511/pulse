@@ -2,9 +2,13 @@ package me.ngyu.pulse.handler;
 
  import me.ngyu.pulse.core.annotation.Autowired;
 import me.ngyu.pulse.core.annotation.Component;
-import me.ngyu.pulse.handler.service.TestService;
+ import me.ngyu.pulse.core.annotation.Controller;
+ import me.ngyu.pulse.core.annotation.GetMapping;
+ import me.ngyu.pulse.handler.service.TestService;
+ import me.ngyu.pulse.http.dto.HttpRequest;
+ import me.ngyu.pulse.http.dto.HttpResponse;
 
-@Component
+@Controller
 public class PingHandler {
 
   @Autowired
@@ -12,8 +16,9 @@ public class PingHandler {
 
   public PingHandler() {}
 
-  public String getResponse() {
+  @GetMapping("/ping")
+  public HttpResponse getResponse(HttpRequest request) {
     testService.test();
-    return "<h1> Ping from DI Container</h1>";
+    return HttpResponse.ok(request, "<h1>Ping from DI Container!</h1>");
   }
 }
