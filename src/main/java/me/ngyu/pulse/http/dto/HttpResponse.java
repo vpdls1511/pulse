@@ -27,6 +27,20 @@ public record HttpResponse(
     return new HttpResponse(request.version(), 404, "Not Found", headers, body);
   }
 
+  public static HttpResponse serverError(HttpRequest request) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Content-Type", "text/html; charset=utf-8");
+    String body = """
+        <html>
+        <body>
+            <h1>500 Bad Request</h1>
+            <p>The page you requested does not exist.</p>
+        </body>
+        </html>
+        """;
+    return new HttpResponse(request.version(), 500, "Bad Request", headers, body);
+  }
+
   /**
    * HTTP 통신규약에 맞춰 응답을 내려주기 위해 구분한다.
    *
