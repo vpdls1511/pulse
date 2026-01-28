@@ -27,26 +27,25 @@ public class RequestProcessor implements Runnable {
 
   @Override
   public void run() {
-    try {
+    try (
+      Socket socket = this.connection;
       BufferedReader reader = new BufferedReader(
-        new InputStreamReader(this.connection.getInputStream())
+        new InputStreamReader(socket.getInputStream())
       );
-
+      OutputStream output = socket.getOutputStream()
+    ) {
       HttpRequest request = HttpParser.parse(reader);
+
       if (request == null) {
-        connection.close();
         return;
       }
+
       String response = this.route(request).build();
 
-      OutputStream outputStream = this.connection.getOutputStream();
-      outputStream.write(response.getBytes(StandardCharsets.UTF_8));
-
-      outputStream.flush();
-      this.connection.close();
-
+      output.write(response.getBytes(StandardCharsets.UTF_8));
+      output.flush();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      e.printStackTrace();
     }
   }
 
@@ -63,7 +62,7 @@ public class RequestProcessor implements Runnable {
       return (HttpResponse) handler.invoke(request);
     } catch (Exception e) {
       e.printStackTrace();
-      return HttpResponse.notFound(request);
+      return HttpResponse.serverError(request);
     }
   }
 }
