@@ -1,7 +1,9 @@
 package me.ngyu.pulse;
 
 import me.ngyu.pulse.core.container.BeanContainer;
+import me.ngyu.pulse.core.handler.HandlerMapper;
 import me.ngyu.pulse.core.scanner.ComponentScanner;
+import me.ngyu.pulse.core.scanner.ControllerScanner;
 import me.ngyu.pulse.core.scanner.DependencyInjector;
 import me.ngyu.pulse.server.PulseServer;
 
@@ -18,11 +20,16 @@ public class Main {
     DependencyInjector injector = new DependencyInjector(beancontainer);
     injector.inject();
 
+    HandlerMapper handlerMapper = new HandlerMapper();
+    ControllerScanner controllerScanner = new ControllerScanner(beancontainer, handlerMapper);
+
+    controllerScanner.scan();
+
     System.out.println("\uD83D\uDCE6 Registered Beans: ");
     beancontainer.getAllBeans().forEach((clazz, instance) -> {
       System.out.println("- " + clazz.getSimpleName());
     });
 
-    new PulseServer(8080, beancontainer).run();
+    new PulseServer(8080, beancontainer, handlerMapper).run();
   }
 }

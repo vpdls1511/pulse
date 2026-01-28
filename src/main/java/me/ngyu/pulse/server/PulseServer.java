@@ -1,6 +1,7 @@
 package me.ngyu.pulse.server;
 
 import me.ngyu.pulse.core.container.BeanContainer;
+import me.ngyu.pulse.core.handler.HandlerMapper;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,13 +13,17 @@ public class PulseServer {
 
   private final int port;
   private final BeanContainer beanContainer;
+  private final HandlerMapper handlerMapper;
+
   private final ExecutorService executor;
 
-  public PulseServer(int port, BeanContainer beanContainer) {
+  public PulseServer(int port, BeanContainer beanContainer, HandlerMapper handlerMapper) {
     int threadPoolSize = Runtime.getRuntime().availableProcessors();
     executor = Executors.newFixedThreadPool(Math.max(threadPoolSize, 2));
-    this.beanContainer = beanContainer;
+
     this.port = port;
+    this.beanContainer = beanContainer;
+    this.handlerMapper = handlerMapper;
   }
 
   public void run() throws IOException {
@@ -29,7 +34,7 @@ public class PulseServer {
 
         while (true) {
           Socket socket = serverSocket.accept();
-          new Thread(new RequestProcessor(socket, beanContainer)).start();
+          new Thread(new RequestProcessor(socket, beanContainer, handlerMapper)).start();
         }
 
       } catch (IOException e) {
