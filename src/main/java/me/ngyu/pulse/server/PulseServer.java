@@ -26,24 +26,17 @@ public class PulseServer {
     this.handlerMapper = handlerMapper;
   }
 
-  public void run() throws IOException {
+  public void run() {
+    try (ServerSocket serverSocket = new ServerSocket(port)) {
+      System.out.println("Pulse Server started on port " + port);
 
-    Thread thread = new Thread(() -> {
-      try (ServerSocket serverSocket = new ServerSocket(port)) {
-        System.out.println("Pulse Server started on port " + port);
-
-        while (true) {
-          Socket socket = serverSocket.accept();
-          new Thread(new RequestProcessor(socket, beanContainer, handlerMapper)).start();
-        }
-
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+      while (true) {
+        Socket socket = serverSocket.accept();
+        executor.submit(new RequestProcessor(socket, beanContainer, handlerMapper));
       }
-    });
-
-    thread.start();
-    System.out.println("Server thread started.");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }
