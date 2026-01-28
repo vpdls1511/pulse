@@ -4,6 +4,7 @@ import me.ngyu.pulse.core.annotation.Component;
 import me.ngyu.pulse.core.container.BeanContainer;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +34,13 @@ public class ComponentScanner {
     List<Class<?>> classes = this.findClasses(dir, packageName);
 
     // 3. @Component 체크 및 등록
-    for(Class<?> clazz : classes) {
-      if(clazz.isAnnotationPresent(Component.class)) {
+    for (Class<?> clazz : classes) {
+
+      if (clazz.isAnnotation()) {
+        continue;
+      }
+
+      if (hasComponentAnnotation(clazz)) {
         Object instance = clazz.getDeclaredConstructor().newInstance();
         beanContainer.register(clazz, instance);
       }
@@ -50,7 +56,7 @@ public class ComponentScanner {
 
     File[] files = directory.listFiles();
 
-    if(files == null) {
+    if (files == null) {
       return classes;
     }
 
@@ -67,5 +73,23 @@ public class ComponentScanner {
     }
 
     return classes;
+  }
+
+  private boolean hasComponentAnnotation(Class<?> clazz) {
+    if (clazz.isAnnotationPresent(Component.class)) {
+      return true;
+    }
+
+    for (Annotation annotation : clazz.getAnnotations()) {
+      if (annotation.annotationType().getPackage().getName().startsWith("java.lang")) {
+        continue;
+      }
+
+      if (annotation.annotationType().isAnnotationPresent(Component.class)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
