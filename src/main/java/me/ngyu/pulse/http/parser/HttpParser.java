@@ -9,6 +9,11 @@ import java.io.IOException;
 public class HttpParser {
   public static HttpRequest parse(BufferedReader reader) throws IOException {
     String requestLine = reader.readLine();
+
+    if (requestLine == null || requestLine.isEmpty()) {
+      return null;
+    }
+
     String[] parts = requestLine.split(" ");
 
     HttpHeaders headers = HeaderParser.parser(reader);

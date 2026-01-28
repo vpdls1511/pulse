@@ -33,7 +33,10 @@ public class RequestProcessor implements Runnable {
       );
 
       HttpRequest request = HttpParser.parse(reader);
-
+      if (request == null) {
+        connection.close();
+        return;
+      }
       String response = this.route(request).build();
 
       OutputStream outputStream = this.connection.getOutputStream();
